@@ -46,9 +46,23 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   }
 
   onTodoCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
-    console.log("name: ",this.state.newTodoName);
+    // check input empty
     if (this.state.newTodoName === "") {
-      alert('Please input create filename')
+      const userConfirmed = window.confirm('Image name is empty. Do you want to proceed?');
+      if (!userConfirmed) {
+        return;
+      }
+    }
+    // check input name duplicate
+    const todos_list = await getTodos(this.props.auth.getIdToken())
+    const isNameDuplicate = todos_list.some(todo => todo.name === this.state.newTodoName);
+
+    console.log("isNameDuplicate: ",isNameDuplicate);
+    if (isNameDuplicate) {
+      const userConfirmed = window.confirm(`Image name "${this.state.newTodoName}" is already in use. Do you want to proceed?`);
+      if (!userConfirmed) {
+        return;
+      }
     }
     try {
       const dueDate = this.calculateDueDate()
